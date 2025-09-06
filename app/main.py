@@ -357,7 +357,7 @@ async def telegram_worker(settings, storage: Storage):
     # Настраиваем локальный Bot API при наличии URL'ов через base_url/file_base_url
     builder = ApplicationBuilder().token(settings.telegram_bot_token)
     if settings.telegram_api_url and settings.telegram_file_api_url:
-        builder = builder.base_url(settings.telegram_api_url.rstrip("/") + "/bot").base_file_url(
+        builder = builder.base_url(settings.telegram_api_url.rstrip("/") + "/bot").file_base_url(
             settings.telegram_file_api_url.rstrip("/") + "/file/bot"
         )
     application: Application = builder.build()
