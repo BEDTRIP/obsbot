@@ -8,7 +8,7 @@ services:
       - .env
     environment:
       # HTTP/Health server
-      - HTTP_PORT=8081
+      - HTTP_PORT=8080
 
       # Storage
       - STORAGE_DIR=/folder
@@ -22,8 +22,11 @@ services:
       # Telegram bot
 #      - TELEGRAM_BOT_TOKEN=yourtoken
 #      - TELEGRAM_NOTIFY_CHAT_ID=chatid
+<<<<<<< HEAD
 #      - TELEGRAM_API_URL=https://host.docker.internal:8081
 #      - TELEGRAM_FILE_API_URL=https://host.docker.internal:8081
+=======
+>>>>>>> parent of 876e343 (added local tg bot)
 
       # IMAP config
 #      - IMAP_HOST=imap.example.ru
@@ -32,30 +35,10 @@ services:
 #      - IMAP_PASSWORD=yourimapuserpassword
       - IMAP_SSL=true
       - IMAP_POLL_INTERVAL=1
-    # Traefik (reverse proxy)
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.obsbot.entrypoints=http"
-      - "traefik.http.routers.obsbot.rule=Host(`obsbot.example.com`)"
-      - "traefik.http.middlewares.obsbot-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.obsbot.middlewares=obsbot-https-redirect"
-      - "traefik.http.routers.obsbot-secure.entrypoints=https"
-      - "traefik.http.routers.obsbot-secure.rule=Host(`obsbot.example.com`)"
-      - "traefik.http.routers.obsbot-secure.tls=true"
-      - "traefik.http.routers.obsbot-secure.service=obsbot"
-      - "traefik.http.services.obsbot.loadbalancer.server.port=8081"
-      - "traefik.docker.network=proxy"
-    networks:
-      - proxy
 
-    # Если Traefik используется, внешний порт можно не публиковать
-    # ports:
-    #   - "8081:8081"
+    ports:
+      - "8080:8080"
     volumes:
       - ./data/folder:/folder
-
-networks:
-  proxy:
-    external: true
 
 
