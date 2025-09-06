@@ -29,6 +29,7 @@ class Settings:
 
     telegram_bot_token: Optional[str]
     telegram_notify_chat_id: Optional[int]
+    telegram_error_sticker_id: Optional[str]
 
     imap_host: Optional[str]
     imap_port: int
@@ -58,6 +59,7 @@ def load_settings() -> Settings:
     telegram_bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
     notify_chat = os.getenv("TELEGRAM_NOTIFY_CHAT_ID")
     telegram_notify_chat_id = int(notify_chat) if notify_chat and notify_chat.strip() else None
+    telegram_error_sticker_id = os.getenv("TELEGRAM_ERROR_STICKER_ID")
 
     imap_host = os.getenv("IMAP_HOST")
     imap_port = int(os.getenv("IMAP_PORT", "993"))
@@ -76,6 +78,7 @@ def load_settings() -> Settings:
         whitelist_tg_ids=whitelist_tg_ids,
         telegram_bot_token=telegram_bot_token,
         telegram_notify_chat_id=telegram_notify_chat_id,
+        telegram_error_sticker_id=telegram_error_sticker_id,
         imap_host=imap_host,
         imap_port=imap_port,
         imap_user=imap_user,
