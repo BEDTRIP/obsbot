@@ -30,10 +30,27 @@ services:
 #      - IMAP_PASSWORD=yourimapuserpassword
       - IMAP_SSL=true
       - IMAP_POLL_INTERVAL=1
-
-    ports:
-      - "8080:8080"
+    # Traefik (reverse proxy)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.obsbot.entrypoints=http"
+      - "traefik.http.routers.obsbot.rule=Host(`obsbot.example.ru`)"
+      - "traefik.http.middlewares.obsbot-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.obsbot.middlewares=obsbot-https-redirect"
+      - "traefik.http.routers.obsbot-secure.entrypoints=https"
+      - "traefik.http.routers.obsbot-secure.rule=Host(`obsbot.example.ru`)"
+      - "traefik.http.routers.obsbot-secure.tls=true"
+      - "traefik.http.routers.obsbot-secure.service=obsbot"
+      - "traefik.http.services.obsbot.loadbalancer.server.port=8080"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+#    ports:
+#      - "8080:8080"
     volumes:
       - ./data/folder:/folder
 
 
+networks:
+  proxy:
+    external: true
