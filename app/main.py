@@ -451,6 +451,7 @@ async def finalize_media_group(context: ContextTypes.DEFAULT_TYPE) -> None:
     if not settings or not storage:
         return
 
+
     chat_id = state["chat_id"]
     message_ids = state["message_ids"]
     saved_names = state["saved_names"]
