@@ -22,8 +22,8 @@ services:
       # Telegram bot
 #      - TELEGRAM_BOT_TOKEN=yourtoken
 #      - TELEGRAM_NOTIFY_CHAT_ID=chatid
-#      - TELEGRAM_API_URL=http://host.docker.internal:8081
-#      - TELEGRAM_FILE_API_URL=http://host.docker.internal:8081
+#      - TELEGRAM_API_URL=https://host.docker.internal:8081
+#      - TELEGRAM_FILE_API_URL=https://host.docker.internal:8081
 
       # IMAP config
 #      - IMAP_HOST=imap.example.ru
