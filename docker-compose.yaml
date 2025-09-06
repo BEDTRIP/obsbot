@@ -22,11 +22,6 @@ services:
       # Telegram bot
 #      - TELEGRAM_BOT_TOKEN=yourtoken
 #      - TELEGRAM_NOTIFY_CHAT_ID=chatid
-<<<<<<< HEAD
-#      - TELEGRAM_API_URL=https://host.docker.internal:8081
-#      - TELEGRAM_FILE_API_URL=https://host.docker.internal:8081
-=======
->>>>>>> parent of 876e343 (added local tg bot)
 
       # IMAP config
 #      - IMAP_HOST=imap.example.ru
