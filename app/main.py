@@ -352,54 +352,28 @@ async def telegram_message_handler(update: Update, context: ContextTypes.DEFAULT
             pass
 
 
-def _build_application(settings) -> Application:
-    """Создаёт Application с учётом кастомного Bot API и таймаутов."""
+async def telegram_worker(settings, storage: Storage):
+    if not settings.telegram_bot_token:
+        return
+    # Таймауты долгих загрузок и подключений
     request = HTTPXRequest(
         connect_timeout=settings.telegram_connect_timeout,
         read_timeout=settings.telegram_read_timeout,
     )
     builder = ApplicationBuilder().token(settings.telegram_bot_token).request(request)
+    # Базовые URL локального Bot API (если указаны)
     if settings.telegram_api_base_url:
         builder = builder.base_url(settings.telegram_api_base_url.rstrip("/"))
     if settings.telegram_api_file_url:
         builder = builder.base_file_url(settings.telegram_api_file_url.rstrip("/"))
-    return builder.build()
-
-
-def _build_application_default(settings) -> Application:
-    """Создаёт Application для официального Bot API (без кастомных URL)."""
-    request = HTTPXRequest(
-        connect_timeout=settings.telegram_connect_timeout,
-        read_timeout=settings.telegram_read_timeout,
-    )
-    return ApplicationBuilder().token(settings.telegram_bot_token).request(request).build()
-
-
-async def telegram_worker(settings, storage: Storage):
-    if not settings.telegram_bot_token:
-        return
-    # Пытаемся запуститься с кастомным Bot API, при проблемах откатываемся на официальный
-    use_custom = bool(settings.telegram_api_base_url or settings.telegram_api_file_url)
-    application: Application
-    try:
-        application = _build_application(settings) if use_custom else _build_application_default(settings)
-        application.bot_data["settings"] = settings
-        application.bot_data["storage"] = storage
-        application.add_handler(MessageHandler(filters.ALL & ~filters.StatusUpdate.ALL, telegram_message_handler))
-        await application.initialize()
-    except Exception as e:
-        logger.warning(f"Не удалось инициализировать Telegram с кастомным Bot API: {e}. Пробуем официальный API...")
-        application = _build_application_default(settings)
-        application.bot_data["settings"] = settings
-        application.bot_data["storage"] = storage
-        application.add_handler(MessageHandler(filters.ALL & ~filters.StatusUpdate.ALL, telegram_message_handler))
-        await application.initialize()
+    application: Application = builder.build()
     application.bot_data["settings"] = settings
     application.bot_data["storage"] = storage
 
     # Обрабатываем все сообщения (текст/медиа), а в хендлере фильтруем сами
     application.add_handler(MessageHandler(filters.ALL & ~filters.StatusUpdate.ALL, telegram_message_handler))
 
+    await application.initialize()
     await application.start()
     try:
         await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
