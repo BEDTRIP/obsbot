@@ -33,6 +33,7 @@ class Settings:
     telegram_api_file_url: Optional[str]
     telegram_connect_timeout: int
     telegram_read_timeout: int
+    telegram_write_timeout: int
 
     imap_host: Optional[str]
     imap_port: int
@@ -84,6 +85,7 @@ def load_settings() -> Settings:
         telegram_api_file_url=os.getenv("TELEGRAM_API_FILE_URL"),
         telegram_connect_timeout=int(os.getenv("TELEGRAM_CONNECT_TIMEOUT", "30")),
         telegram_read_timeout=int(os.getenv("TELEGRAM_READ_TIMEOUT", "3600")),
+        telegram_write_timeout=int(os.getenv("TELEGRAM_WRITE_TIMEOUT", "3600")),
         imap_host=imap_host,
         imap_port=imap_port,
         imap_user=imap_user,
