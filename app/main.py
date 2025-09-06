@@ -168,12 +168,6 @@ async def _download_and_save_telegram_attachments(update: Update, context: Conte
     async def _save_file(file_id: str, suggested_name: str, display_name: Optional[str] = None) -> None:
         try:
             tg_file = await context.bot.get_file(file_id)
-            try:
-                size = getattr(tg_file, "file_size", None)
-                if size is not None:
-                    logger.info(f"Telegram файл {suggested_name} размер: {size} байт")
-            except Exception:
-                pass
             # Сохраняем напрямую в каталог вложений
             target_name = suggested_name
             # Гарантируем уникальность имени
@@ -363,7 +357,6 @@ def _build_application(settings) -> Application:
     request = HTTPXRequest(
         connect_timeout=settings.telegram_connect_timeout,
         read_timeout=settings.telegram_read_timeout,
-        write_timeout=settings.telegram_write_timeout,
     )
     builder = ApplicationBuilder().token(settings.telegram_bot_token).request(request)
     if settings.telegram_api_base_url:
@@ -378,7 +371,6 @@ def _build_application_default(settings) -> Application:
     request = HTTPXRequest(
         connect_timeout=settings.telegram_connect_timeout,
         read_timeout=settings.telegram_read_timeout,
-        write_timeout=settings.telegram_write_timeout,
     )
     return ApplicationBuilder().token(settings.telegram_bot_token).request(request).build()
 
