@@ -184,56 +184,23 @@ async def _download_and_save_telegram_attachments(update: Update, context: Conte
         except Exception as e:
             logger.warning(f"Не удалось сохранить вложение Telegram {suggested_name}: {e}")
 
-    # Лимит для облачного Bot API: ~20 МБ. Если файл больше — отвечаем стикером ошибки и пропускаем
-    LIMIT_BYTES = 20 * 1024 * 1024
-    error_sticker_id: Optional[str] = context.application.bot_data.get("settings").telegram_error_sticker_id if context.application.bot_data.get("settings") else None
-
-    async def _maybe_reject_large(file_size: Optional[int]) -> bool:
-        if file_size is not None and file_size > LIMIT_BYTES:
-            try:
-                if error_sticker_id:
-                    await message.reply_sticker(sticker=error_sticker_id)
-                else:
-                    await context.bot.set_message_reaction(
-                        chat_id=message.chat_id,
-                        message_id=message.message_id,
-                        reaction=[ReactionTypeEmoji(emoji="⚠️")],
-                        is_big=False,
-                    )
-            except Exception:
-                pass
-            return True
-        return False
-
     # Документы, аудио, видео, фото, голос, стикер, гиф (animation), видеосообщение
     if message.document:
-        if await _maybe_reject_large(message.document.file_size):
-            return saved_names, display_and_saved
         file_name = message.document.file_name or f"document_{message.document.file_unique_id}"
         await _save_file(message.document.file_id, file_name, display_name=message.document.file_name)
     if message.audio:
-        if await _maybe_reject_large(message.audio.file_size):
-            return saved_names, display_and_saved
         file_name = message.audio.file_name or f"audio_{message.audio.file_unique_id}.mp3"
         await _save_file(message.audio.file_id, file_name, display_name=message.audio.file_name)
     if message.voice:
-        if await _maybe_reject_large(message.voice.file_size):
-            return saved_names, display_and_saved
         file_name = f"voice_{message.voice.file_unique_id}.ogg"
         await _save_file(message.voice.file_id, file_name)
     if message.video:
-        if await _maybe_reject_large(message.video.file_size):
-            return saved_names, display_and_saved
         file_name = message.video.file_name or f"video_{message.video.file_unique_id}.mp4"
         await _save_file(message.video.file_id, file_name)
     if message.video_note:
-        if await _maybe_reject_large(message.video_note.file_size):
-            return saved_names, display_and_saved
         file_name = f"video_note_{message.video_note.file_unique_id}.mp4"
         await _save_file(message.video_note.file_id, file_name)
     if message.animation:
-        if await _maybe_reject_large(message.animation.file_size):
-            return saved_names, display_and_saved
         file_name = message.animation.file_name or f"animation_{message.animation.file_unique_id}.mp4"
         await _save_file(message.animation.file_id, file_name)
     if message.sticker:
@@ -246,12 +213,6 @@ async def _download_and_save_telegram_attachments(update: Update, context: Conte
     if message.photo:
         # Берём самое большое фото
         photo = message.photo[-1]
-        # У PhotoSize нет file_size? В PTB обычно есть. Проверка на всякий случай
-        try:
-            if await _maybe_reject_large(getattr(photo, "file_size", None)):
-                return saved_names, display_and_saved
-        except Exception:
-            pass
         file_name = f"photo_{photo.file_unique_id}.jpg"
         await _save_file(photo.file_id, file_name)
 
