@@ -355,22 +355,18 @@ async def telegram_message_handler(update: Update, context: ContextTypes.DEFAULT
 async def telegram_worker(settings, storage: Storage):
     if not settings.telegram_bot_token:
         return
-    # Настройка подключения к локальному Bot API при необходимости
-    request_args = {}
-    if settings.telegram_api_base_url:
-        request_args["base_url"] = settings.telegram_api_base_url.rstrip("/")
-    if settings.telegram_api_file_url:
-        request_args["base_file_url"] = settings.telegram_api_file_url.rstrip("/")
-    request_args["connect_timeout"] = settings.telegram_connect_timeout
-    request_args["read_timeout"] = settings.telegram_read_timeout
-
-    request = HTTPXRequest(**request_args)
-    application: Application = (
-        ApplicationBuilder()
-        .token(settings.telegram_bot_token)
-        .request(request)
-        .build()
+    # Таймауты долгих загрузок и подключений
+    request = HTTPXRequest(
+        connect_timeout=settings.telegram_connect_timeout,
+        read_timeout=settings.telegram_read_timeout,
     )
+    builder = ApplicationBuilder().token(settings.telegram_bot_token).request(request)
+    # Базовые URL локального Bot API (если указаны)
+    if settings.telegram_api_base_url:
+        builder = builder.base_url(settings.telegram_api_base_url.rstrip("/"))
+    if settings.telegram_api_file_url:
+        builder = builder.base_file_url(settings.telegram_api_file_url.rstrip("/"))
+    application: Application = builder.build()
     application.bot_data["settings"] = settings
     application.bot_data["storage"] = storage
 
