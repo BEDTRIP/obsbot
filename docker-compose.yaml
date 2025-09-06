@@ -23,7 +23,6 @@ services:
 #      - TELEGRAM_BOT_TOKEN=yourtoken
 #      - TELEGRAM_NOTIFY_CHAT_ID=chatid
 
-
       # IMAP config
 #      - IMAP_HOST=imap.example.ru
       - IMAP_PORT=993
@@ -33,44 +32,25 @@ services:
       - IMAP_POLL_INTERVAL=1
     # Traefik (reverse proxy)
     labels:
-      - "traefik.enable=${TRAEFIK_ENABLE:-true}"
-      - "traefik.http.routers.obsbot.entrypoints=${TRAEFIK_ENTRYPOINT_WEB:-web}"
-      - "traefik.http.routers.obsbot.rule=Host(`${DOMAIN}`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.obsbot.entrypoints=http"
+      - "traefik.http.routers.obsbot.rule=Host(`obsbot.example.ru`)"
       - "traefik.http.middlewares.obsbot-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.obsbot.middlewares=obsbot-https-redirect"
-      - "traefik.http.routers.obsbot-secure.entrypoints=${TRAEFIK_ENTRYPOINT_WEBSECURE:-websecure}"
-      - "traefik.http.routers.obsbot-secure.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.obsbot-secure.entrypoints=https"
+      - "traefik.http.routers.obsbot-secure.rule=Host(`obsbot.example.ru`)"
       - "traefik.http.routers.obsbot-secure.tls=true"
       - "traefik.http.routers.obsbot-secure.service=obsbot"
       - "traefik.http.services.obsbot.loadbalancer.server.port=8080"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.obsbot-secure.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}"
     networks:
       - proxy
 #    ports:
 #      - "8080:8080"
     volumes:
       - ./data/folder:/folder
-  telegram-bot-api:
-    image: aiogram/telegram-bot-api:latest
-    container_name: telegram-bot-api
-    restart: unless-stopped
-    environment:
-      - TELEGRAM_API_ID=${TELEGRAM_API_ID}
-      - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
-      - TELEGRAM_STAT_API_HOST=0.0.0.0
-      - TELEGRAM_LOCAL=true
-    volumes:
-      - botapi-data:/var/lib/telegram-bot-api
-    networks:
-      - proxy
-    labels:
-      - "traefik.enable=false"
 
 
 networks:
   proxy:
     external: true
-
-volumes:
-  botapi-data:
