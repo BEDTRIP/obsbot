@@ -14,6 +14,7 @@ from imapclient import IMAPClient
 from telegram import Bot, Update, ReactionTypeEmoji
 from telegram.constants import ChatType
 from telegram.ext import Application, ApplicationBuilder, ContextTypes, MessageHandler, filters
+from telegram.request import HTTPXRequest
 
 from .config import load_settings
 from .storage import Storage
@@ -354,13 +355,15 @@ async def telegram_message_handler(update: Update, context: ContextTypes.DEFAULT
 async def telegram_worker(settings, storage: Storage):
     if not settings.telegram_bot_token:
         return
-    # Настраиваем локальный Bot API при наличии URL'ов через base_url/file_base_url
-    builder = ApplicationBuilder().token(settings.telegram_bot_token)
+    # Настраиваем локальный Bot API при наличии URL'ов
     if settings.telegram_api_url and settings.telegram_file_api_url:
-        builder = builder.base_url(settings.telegram_api_url.rstrip("/") + "/bot").file_base_url(
-            settings.telegram_file_api_url.rstrip("/") + "/file/bot"
+        request = HTTPXRequest(
+            api_url=settings.telegram_api_url.rstrip("/") + "/bot",
+            file_api_url=settings.telegram_file_api_url.rstrip("/") + "/file/bot",
         )
-    application: Application = builder.build()
+        application: Application = ApplicationBuilder().token(settings.telegram_bot_token).request(request).build()
+    else:
+        application: Application = ApplicationBuilder().token(settings.telegram_bot_token).build()
     application.bot_data["settings"] = settings
     application.bot_data["storage"] = storage
 
