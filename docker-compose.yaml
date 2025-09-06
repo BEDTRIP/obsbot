@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  obsbot:
+    build: .
+    container_name: obsbot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # HTTP/Health server
+      - HTTP_PORT=8080
+
+      # Storage
+      - STORAGE_DIR=/folder
+      - ATTACHMENTS_SUBDIR=attachments
+      - TIMEZONE=Europe/Moscow
+
+      # Whitelists (comma-separated)
+#      - WHITELIST_EMAILS=allowed,emails,separated,by,comma
+#      - WHITELIST_TG_USERNAMES=allowed,usernames,separated,by,comma
+
+      # Telegram bot
+#      - TELEGRAM_BOT_TOKEN=yourtoken
+#      - TELEGRAM_NOTIFY_CHAT_ID=chatid
+
+      # IMAP config
+#      - IMAP_HOST=imap.example.ru
+      - IMAP_PORT=993
+#      - IMAP_USER=yourimapuser@example.ru
+#      - IMAP_PASSWORD=yourimapuserpassword
+      - IMAP_SSL=true
+      - IMAP_POLL_INTERVAL=1
+
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/folder:/folder
+
+
