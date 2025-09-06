@@ -29,6 +29,10 @@ class Settings:
 
     telegram_bot_token: Optional[str]
     telegram_notify_chat_id: Optional[int]
+    telegram_api_base_url: Optional[str]
+    telegram_api_file_url: Optional[str]
+    telegram_connect_timeout: int
+    telegram_read_timeout: int
 
     imap_host: Optional[str]
     imap_port: int
@@ -76,6 +80,10 @@ def load_settings() -> Settings:
         whitelist_tg_ids=whitelist_tg_ids,
         telegram_bot_token=telegram_bot_token,
         telegram_notify_chat_id=telegram_notify_chat_id,
+        telegram_api_base_url=os.getenv("TELEGRAM_API_BASE_URL"),
+        telegram_api_file_url=os.getenv("TELEGRAM_API_FILE_URL"),
+        telegram_connect_timeout=int(os.getenv("TELEGRAM_CONNECT_TIMEOUT", "30")),
+        telegram_read_timeout=int(os.getenv("TELEGRAM_READ_TIMEOUT", "3600")),
         imap_host=imap_host,
         imap_port=imap_port,
         imap_user=imap_user,
