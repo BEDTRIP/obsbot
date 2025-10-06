@@ -202,7 +202,7 @@ class Storage:
         # Заключительный блок
         md_lines.append("---")
         md_lines.append("## Инпуты")
-        md_lines.append(f"- [ ] Просмотреть 🔽⏳[[{date_str}]]")
+        md_lines.append(f"- [ ] Просмотреть 🔽 ⏳ {date_str}")
 
         with open(filename, "w", encoding="utf-8") as f:
             f.write("\n".join(md_lines))
