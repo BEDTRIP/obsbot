@@ -83,7 +83,7 @@ async def imap_worker(settings, storage: Storage):
         try:
             bot_kwargs = {}
             if settings.telegram_proxy_url:
-                bot_kwargs["request"] = HTTPXRequest(proxy_url=settings.telegram_proxy_url)
+                bot_kwargs["request"] = HTTPXRequest(proxy=settings.telegram_proxy_url)
             bot = Bot(token=settings.telegram_bot_token, **bot_kwargs)
         except Exception:
             bot = None
@@ -361,9 +361,9 @@ async def telegram_worker(settings, storage: Storage):
     builder = ApplicationBuilder().token(settings.telegram_bot_token)
     if settings.telegram_proxy_url:
         builder = builder.request(
-            HTTPXRequest(proxy_url=settings.telegram_proxy_url)
+            HTTPXRequest(proxy=settings.telegram_proxy_url)
         ).get_updates_request(
-            HTTPXRequest(proxy_url=settings.telegram_proxy_url)
+            HTTPXRequest(proxy=settings.telegram_proxy_url)
         )
     application: Application = builder.build()
     application.bot_data["settings"] = settings
