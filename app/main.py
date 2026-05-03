@@ -14,6 +14,7 @@ from imapclient import IMAPClient
 from telegram import Bot, Update, ReactionTypeEmoji
 from telegram.constants import ChatType
 from telegram.ext import Application, ApplicationBuilder, ContextTypes, MessageHandler, filters
+from telegram.request import HTTPXRequest
 
 from .config import load_settings
 from .storage import Storage
@@ -80,7 +81,10 @@ async def imap_worker(settings, storage: Storage):
     bot: Optional[Bot] = None
     if settings.telegram_bot_token and settings.telegram_notify_chat_id:
         try:
-            bot = Bot(token=settings.telegram_bot_token)
+            bot_kwargs = {}
+            if settings.telegram_proxy_url:
+                bot_kwargs["request"] = HTTPXRequest(proxy_url=settings.telegram_proxy_url)
+            bot = Bot(token=settings.telegram_bot_token, **bot_kwargs)
         except Exception:
             bot = None
     while True:
@@ -354,7 +358,10 @@ async def telegram_message_handler(update: Update, context: ContextTypes.DEFAULT
 async def telegram_worker(settings, storage: Storage):
     if not settings.telegram_bot_token:
         return
-    application: Application = ApplicationBuilder().token(settings.telegram_bot_token).build()
+    builder = ApplicationBuilder().token(settings.telegram_bot_token)
+    if settings.telegram_proxy_url:
+        builder = builder.proxy_url(settings.telegram_proxy_url).get_updates_proxy_url(settings.telegram_proxy_url)
+    application: Application = builder.build()
     application.bot_data["settings"] = settings
     application.bot_data["storage"] = storage
 

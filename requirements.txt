@@ -1,4 +1,4 @@
-python-telegram-bot>=21.0
+python-telegram-bot[socks]>=21.0
 fastapi>=0.111.0
 uvicorn[standard]>=0.30.0
 imapclient>=2.3.1
