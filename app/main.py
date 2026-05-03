@@ -360,7 +360,11 @@ async def telegram_worker(settings, storage: Storage):
         return
     builder = ApplicationBuilder().token(settings.telegram_bot_token)
     if settings.telegram_proxy_url:
-        builder = builder.proxy_url(settings.telegram_proxy_url).get_updates_proxy_url(settings.telegram_proxy_url)
+        builder = builder.request(
+            HTTPXRequest(proxy_url=settings.telegram_proxy_url)
+        ).get_updates_request(
+            HTTPXRequest(proxy_url=settings.telegram_proxy_url)
+        )
     application: Application = builder.build()
     application.bot_data["settings"] = settings
     application.bot_data["storage"] = storage
